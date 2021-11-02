@@ -1,32 +1,38 @@
-const User = require('../models/users.model');
+require('dotenv').config();
+const { sign, verify } = require('jsonwebtoken');
+const usersModel = require('../models/users.model');
 const controller = {
 	login: (req, res) => {
-		const { email, password } = req.body;
-		res.json({ email, password });
+		const { user } = req;
+		const { email, password } = user;
+		sign({ email, password }, process.env.JWT_SECRET_KEY, { expiresIn: '1d' }, (err, token) => {
+			if (err) return res.status(403).json({ error: err.message });
+			if (!user.comparePasswords(password)) return res.status(401).json({ msg: 'Incorrect email or password' });
+			if (!user.isVerified)
+				return res.status(401).json({
+					msg: `
+				Your Email has not been verified. Please click on resend
+				`
+				});
+			return res.status(200).json({ token });
+		});
 	},
-	signup: (req, res) => {
-		const { username, email, password } = req.body;
-		const sgMail = require('@sendgrid/mail');
-		sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-		const msg = {
-			to: 'atech9801@gmail.com', // Change to your recipient
-			from: 'ali99yasin@gmail.com', // Change to your verified sender
-			subject: 'Account Verification',
-			text: `Hello ${username}, please verify your email address from the link below`,
-			html: `    <h1>Verification Link:</h1><br>
-    <a href="http://grade-app.herokuapp.com"></a>`
-		};
-		sgMail
-			.send(msg)
-			.then(() => {
-				console.log('Email sent');
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+	verifyAccount: async (req, res) => {
+		const { user } = req;
+		if (user.isVerified) {
+			return res.status(200).json('User has been already verified. Please Login');
+		}
+		try {
+			await usersModel.findByIdAndUpdate(user._id, { isVerified: true });
+			return res.status(200).json({ msg: 'User was Verified Successfully' });
+		} catch (error) {
+			return res.status(500).json({ error: error.message });
+		}
 	},
-	getAll: (req, res) => {
-		res.send('<h1>Hello there</h1>');
+	getUser: (req, res) => {
+		verify(req.token, process.env.JWT_SECRET_KEY, (err, authData) => {
+			err ? res.status(403).json({ error: err.message }) : res.status(200).json({ authData });
+		});
 	}
 };
 

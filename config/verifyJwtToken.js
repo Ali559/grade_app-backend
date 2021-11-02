@@ -1,5 +1,5 @@
-export default function verifyToken(req, res, next) {
-	const bearerHeader = req.headers['authorization'];
+module.exports = function verifyToken(req, res, next) {
+	const bearerHeader = req.headers['Authorization'];
 	if (typeof bearerHeader !== 'undefined') {
 		const bearer = bearerHeader.split(' ');
 		const bearerToken = bearer[1];
@@ -10,4 +10,4 @@ export default function verifyToken(req, res, next) {
 		res.status(403).json('Forbidden');
 		next();
 	}
-}
+};

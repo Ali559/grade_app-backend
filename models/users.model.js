@@ -13,6 +13,7 @@ const UserSchema = new Schema(
 			required: true,
 			unique: true
 		},
+		isVerified: { type: Boolean, default: false },
 		password: {
 			type: String,
 			required: true,
@@ -25,10 +26,13 @@ const UserSchema = new Schema(
 	{ timestamps: true }
 );
 
-UserSchema.pre('save', async function(next) {
-	const user = this;
-	const hash = await bcrypt.hash(user.password, 8);
-	next();
+UserSchema.pre('save', function preSave() {
+	bcrypt
+		.hash(this.password, 10)
+		.then((hash) => {
+			this.password = hash;
+		})
+		.catch((err) => console.log(err));
 });
 
 UserSchema.methods.comparePasswords = async function(inputPassword) {
