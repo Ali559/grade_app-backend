@@ -1,13 +1,13 @@
 module.exports = function verifyToken(req, res, next) {
-	const bearerHeader = req.headers['Authorization'];
+	const bearerHeader = req.headers['authorization'];
+	console.log(bearerHeader);
 	if (typeof bearerHeader !== 'undefined') {
 		const bearer = bearerHeader.split(' ');
 		const bearerToken = bearer[1];
-
 		req.token = bearerToken;
 		next();
+		return;
 	} else {
-		res.status(403).json('Forbidden');
-		next();
+		return res.status(403).json({ message: 'Forbidden Route' });
 	}
 };

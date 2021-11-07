@@ -8,7 +8,7 @@ const CRUD = {
 			const user = await Users.findOne({ email });
 			if (!user) {
 				res.status(404).json({
-					msg: `The email address ${email} 
+					message: `The email address ${email} 
 						is not associated with any account. please check and try again!`
 				});
 			}
@@ -43,7 +43,7 @@ const CRUD = {
 			if (alreadyExists) {
 				return res
 					.status(401)
-					.json({ msg: 'This email is already associated with another account, please Login' });
+					.json({ message: 'This email is already associated with another account, please Login' });
 			}
 			next();
 		} catch (error) {
@@ -59,7 +59,7 @@ const CRUD = {
 				next();
 			}
 		} catch (error) {
-			return res.status(4001).json({ error: error.message });
+			return res.status(4001).json({ message: error.message });
 		}
 	},
 	findUserWithToken: async (req, res, next) => {
@@ -82,7 +82,7 @@ const CRUD = {
 			req.token = token;
 			next();
 		} catch (error) {
-			return res.status(500).json({ error: error.message });
+			return res.status(500).json({ message: error.message });
 		}
 	}
 };

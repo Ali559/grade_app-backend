@@ -26,18 +26,18 @@ const UserSchema = new Schema(
 	{ timestamps: true }
 );
 
-UserSchema.pre('save', function preSave() {
+UserSchema.pre('save', function(next) {
 	bcrypt
 		.hash(this.password, 10)
 		.then((hash) => {
 			this.password = hash;
+			next();
 		})
 		.catch((err) => console.log(err));
 });
 
 UserSchema.methods.comparePasswords = async function(inputPassword) {
-	const user = this;
-	return await bcrypt.compare(inputPassword, user.password);
+	return await bcrypt.compare(inputPassword, this.password);
 };
 
 module.exports = model('Users', UserSchema);

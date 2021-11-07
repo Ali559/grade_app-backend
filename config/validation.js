@@ -8,10 +8,10 @@ async function validateLogin(req, res, next) {
 	});
 	try {
 		const { error } = await schema.validate({ email, password });
-		if (error) return res.status(401).json({ error: error.details[0].message });
+		if (error) return res.status(401).json({ message: error.details[0].message });
 		next();
 	} catch (err) {
-		return res.status(401).json({ error: err.message });
+		return res.status(401).json({ message: err.message });
 	}
 }
 async function validateSignup(req, res, next) {
@@ -23,10 +23,10 @@ async function validateSignup(req, res, next) {
 	});
 	try {
 		const { error } = await schema.validate({ username, email, password });
-		if (error) return res.status(401).json({ error: error.details[0].message });
+		if (error) return res.status(401).json({ message: error.details[0].message });
 		next();
 	} catch (err) {
-		return res.status(401).json({ error: err.message });
+		return res.status(401).json({ message: err.message });
 	}
 }
 

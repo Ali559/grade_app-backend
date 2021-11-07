@@ -17,7 +17,7 @@ function verifySignupEmail(req, res, next) {
 		.send(msg)
 		.then(() => {
 			res.status(200).json({
-				msg:
+				message:
 					'A verification email has been sent to ' +
 					email +
 					'. It will expire after one hour. If you did not get verification Email click on resend token.'
@@ -26,7 +26,7 @@ function verifySignupEmail(req, res, next) {
 			return;
 		})
 		.catch((error) => {
-			return res.status(500).json({ error: error });
+			return res.status(500).json({ message: error });
 		});
 }
 
