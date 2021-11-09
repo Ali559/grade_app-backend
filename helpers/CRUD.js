@@ -1,5 +1,6 @@
 const Users = require('../models/users.model');
 const Tokens = require('../models/tokens.model');
+const Codes = require('../models/resetCode.model');
 const crypto = require('crypto');
 const CRUD = {
 	findOneUser: async (req, res, next) => {
@@ -11,6 +12,7 @@ const CRUD = {
 					message: `The email address ${email} 
 						is not associated with any account. please check and try again!`
 				});
+				return;
 			}
 			req.user = user;
 			next();
@@ -54,12 +56,11 @@ const CRUD = {
 		const { token } = req.params.token;
 		try {
 			const tk = await Tokens.findOne(token);
-			if (tk) {
-				req.token = tk;
-				next();
-			}
+			if (!tk) return res.status(404).json({ message: `The token might've expired, please try again` });
+			req.token = tk;
+			next();
 		} catch (error) {
-			return res.status(4001).json({ message: error.message });
+			return next(error.message);
 		}
 	},
 	findUserWithToken: async (req, res, next) => {
@@ -67,14 +68,32 @@ const CRUD = {
 		const { email } = req.params;
 		try {
 			const user = await Users.findOne({ _id: token._userId, email });
-			if (user) {
-				req.user = user;
-				next();
-			}
+			if (!user)
+				return res.status(404).json({
+					message: `Could not find the account with the corresponding token, please make sure you've created the account!`
+				});
+			req.user = user;
+			next();
 		} catch (error) {
 			next(error.message);
 		}
 	},
+	findResetCode: async (req, res, next) => {
+		const { code } = req.body;
+		try {
+			const cd = await Codes.findOne({ code });
+			if (!cd) {
+				return res
+					.status(400)
+					.json({ message: `The code you have enterd is Incorrect, please check your inbox, or try again` });
+			}
+			req.code = cd;
+			next();
+		} catch (error) {
+			return next(error.message);
+		}
+	},
+
 	createToken: async (req, res, next) => {
 		const { user } = req;
 		try {
@@ -82,7 +101,20 @@ const CRUD = {
 			req.token = token;
 			next();
 		} catch (error) {
-			return res.status(500).json({ message: error.message });
+			return next(error.message);
+		}
+	},
+	createResetCode: async (req, res, next) => {
+		const { user } = req;
+		try {
+			const resetCode = await Codes.create({
+				_userId: user._id,
+				code: Math.floor(1000 + Math.random() * 9000)
+			});
+			req.resetCode = resetCode.code;
+			next();
+		} catch (error) {
+			return next(error.message);
 		}
 	}
 };

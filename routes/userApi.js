@@ -7,11 +7,19 @@ const {
 	findToken,
 	findOneUser,
 	createUser,
-	findUserWithToken
+	findUserWithToken,
+	createResetCode,
+	findResetCode
 } = require('../helpers/CRUD');
-const { login, getUser, verifyAccount } = require('../controllers/users.controller.js');
+const {
+	login,
+	getUser,
+	verifyAccount,
+	submitResetCode,
+	updatePassword
+} = require('../controllers/users.controller.js');
 const verifyJwtToken = require('../config/verifyJwtToken');
-const { verifySignupEmail } = require('../helpers/verifyEmail');
+const { verifySignupEmail, sendResetCode } = require('../helpers/verifyEmail');
 
 router.post('/login', validateLogin, findOneUser, login);
 
@@ -20,5 +28,11 @@ router.post('/signup', validateSignup, findIfUserExists, createUser, createToken
 router.get('/all', verifyJwtToken, getUser);
 
 router.get('/verfiy-email/:email/:token', findToken, findUserWithToken, verifyAccount);
+
+router.post('/send-reset-code', findOneUser, createResetCode, sendResetCode);
+
+router.post('/verify-reset-code/:email', findResetCode, submitResetCode);
+
+router.post('/reset-password/:email', updatePassword);
 
 module.exports = router;
