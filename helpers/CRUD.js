@@ -9,8 +9,7 @@ const CRUD = {
 			const user = await Users.findOne({ email });
 			if (!user) {
 				res.status(404).json({
-					message: `The email address ${email} 
-						is not associated with any account. please check and try again!`
+					message: `The email address ${email} is not associated with any account. please check and try again!`
 				});
 				return;
 			}

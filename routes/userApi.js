@@ -29,10 +29,10 @@ router.get('/all', verifyJwtToken, getUser);
 
 router.get('/verfiy-email/:email/:token', findToken, findUserWithToken, verifyAccount);
 
-router.post('/send-reset-code', findOneUser, createResetCode, sendResetCode);
+router.post('/reset/send-reset-code', findOneUser, createResetCode, sendResetCode);
 
-router.post('/verify-reset-code/:email', findResetCode, submitResetCode);
+router.post('/reset/verify-reset-code/:email', findResetCode, submitResetCode);
 
-router.post('/reset-password/:email', updatePassword);
+router.post('/reset/reset-password/:email', updatePassword);
 
 module.exports = router;
